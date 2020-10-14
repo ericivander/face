@@ -1,0 +1,15 @@
+{{define "index"}}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Detect Face</title>
+</head>
+<body>
+<form action="/detect" method="post" enctype="multipart/form-data">
+    Image: <input type="file" name="image"><br><br>
+    <input type="submit" value="Submit">
+</form>
+</body>
+</html>
+{{end}}

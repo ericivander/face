@@ -1,20 +1,37 @@
 package main
 
 import (
+	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 
 	_ "image/jpeg"
+	_ "image/png"
 
 	pigo "github.com/esimov/pigo/core"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
+type Template struct {
+	templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
 func main() {
+	// Echo Template
+	t := &Template{
+		templates: template.Must(template.ParseGlob("views/*.html")),
+	}
+
 	// Echo instance
 	e := echo.New()
+	e.Renderer = t
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -22,6 +39,7 @@ func main() {
 
 	// Routes
 	e.GET("/", hello)
+	e.GET("/upload", uploadPage)
 	e.POST("/detect", detectFace)
 
 	// Start server
@@ -30,6 +48,10 @@ func main() {
 
 func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello World!")
+}
+
+func uploadPage(c echo.Context) error {
+	return c.Render(http.StatusOK, "index", nil)
 }
 
 func detectFace(c echo.Context) error {
