@@ -41,7 +41,7 @@ func main() {
 
 	// Routes
 	e.GET("/", hello)
-	e.GET("/upload", uploadPage)
+	e.GET("/index", index)
 	e.POST("/detect", detectFace)
 	e.POST("/hash", hashImage)
 	e.POST("/compare", compareImages)
@@ -54,7 +54,7 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello World!")
 }
 
-func uploadPage(c echo.Context) error {
+func index(c echo.Context) error {
 	return c.Render(http.StatusOK, "index", nil)
 }
 

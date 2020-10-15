@@ -3,11 +3,25 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Detect Face</title>
+    <title>Prototype</title>
 </head>
 <body>
+<h2>Face Detection (Q)</h2>
 <form action="/detect" method="post" enctype="multipart/form-data">
     Image: <input type="file" name="image"><br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<h2>Image Hashing</h2>
+<form action="/hash" method="post" enctype="multipart/form-data">
+    Image: <input type="file" name="image"><br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<h2>Images Comparison</h2>
+<form action="/compare" method="post" enctype="multipart/form-data">
+    Image 1: <input type="file" name="image1"><br><br>
+    Image 2: <input type="file" name="image2"><br><br>
     <input type="submit" value="Submit">
 </form>
 </body>
