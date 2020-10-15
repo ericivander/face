@@ -2,6 +2,7 @@ package main
 
 import (
 	"html/template"
+	"image"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,6 +14,7 @@ import (
 	pigo "github.com/esimov/pigo/core"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/vitali-fedulov/images"
 )
 
 type Template struct {
@@ -41,6 +43,8 @@ func main() {
 	e.GET("/", hello)
 	e.GET("/upload", uploadPage)
 	e.POST("/detect", detectFace)
+	e.POST("/hash", hashImage)
+	e.POST("/compare", compareImages)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":2234"))
@@ -111,4 +115,74 @@ func detectFace(c echo.Context) error {
 	dets = classifier.ClusterDetections(dets, 0.2)
 
 	return c.JSON(200, dets)
+}
+
+type imageHash struct {
+	Hash []float32 `json:"hash"`
+}
+
+func hashImage(c echo.Context) error {
+	// Source
+	fileHeader, err := c.FormFile("image")
+	if err != nil {
+		return err
+	}
+	file, err := fileHeader.Open()
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return err
+	}
+
+	hash, _ := images.Hash(img)
+
+	return c.JSON(200, &imageHash{Hash: hash})
+}
+
+type imageCompare struct {
+	Similar bool `json:"similar"`
+}
+
+func compareImages(c echo.Context) error {
+	// Source
+	fileHeader1, err := c.FormFile("image1")
+	if err != nil {
+		return err
+	}
+	file1, err := fileHeader1.Open()
+	if err != nil {
+		return err
+	}
+	defer file1.Close()
+
+	img1, _, err := image.Decode(file1)
+	if err != nil {
+		return err
+	}
+
+	fileHeader2, err := c.FormFile("image2")
+	if err != nil {
+		return err
+	}
+	file2, err := fileHeader2.Open()
+	if err != nil {
+		return err
+	}
+	defer file2.Close()
+
+	img2, _, err := image.Decode(file2)
+	if err != nil {
+		return err
+	}
+
+	hash1, point1 := images.Hash(img1)
+	hash2, point2 := images.Hash(img2)
+
+	similar := images.Similar(hash1, hash2, point1, point2)
+
+	return c.JSON(200, &imageCompare{Similar: similar})
 }
